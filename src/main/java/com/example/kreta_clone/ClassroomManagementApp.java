@@ -9,7 +9,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -23,35 +22,170 @@ public class ClassroomManagementApp extends Application {
     // Data models
     public static class Student {
         private final SimpleStringProperty name;
-        private final SimpleIntegerProperty mathGrade;
-        private final SimpleIntegerProperty physicsGrade;
-        private final SimpleIntegerProperty historyGrade;
+        private final List<Integer> mathGrades;
+        private final List<Integer> physicsGrades;
+        private final List<Integer> historyGrades;
 
-        public Student(String name, int mathGrade, int physicsGrade, int historyGrade) {
+        private final List<Integer> biologyGrades;
+        private final List<Integer> literatureGrades;
+        private final List<Integer> digitalCultureGrades;
+
+        public Student(String name) {
             this.name = new SimpleStringProperty(name);
-            this.mathGrade = new SimpleIntegerProperty(mathGrade);
-            this.physicsGrade = new SimpleIntegerProperty(physicsGrade);
-            this.historyGrade = new SimpleIntegerProperty(historyGrade);
+            this.mathGrades = new ArrayList<>();
+            this.physicsGrades = new ArrayList<>();
+            this.historyGrades = new ArrayList<>();
+            this.biologyGrades = new ArrayList<>();
+            this.literatureGrades = new ArrayList<>();
+            this.digitalCultureGrades = new ArrayList<>();
+        }
+
+        // Legacy constructor for backwards compatibility
+        public Student(String name, int mathGrade, int physicsGrade, int historyGrade) {
+            this(name);
+            this.mathGrades.add(mathGrade);
+            this.physicsGrades.add(physicsGrade);
+            this.historyGrades.add(historyGrade);
         }
 
         public String getName() { return name.get(); }
         public void setName(String name) { this.name.set(name); }
         public SimpleStringProperty nameProperty() { return name; }
 
-        public int getMathGrade() { return mathGrade.get(); }
-        public void setMathGrade(int mathGrade) { this.mathGrade.set(mathGrade); }
-        public SimpleIntegerProperty mathGradeProperty() { return mathGrade; }
+        public List<Integer> getMathGrades() { return mathGrades; }
+        public List<Integer> getPhysicsGrades() { return physicsGrades; }
+        public List<Integer> getHistoryGrades() { return historyGrades; }
 
-        public int getPhysicsGrade() { return physicsGrade.get(); }
-        public void setPhysicsGrade(int physicsGrade) { this.physicsGrade.set(physicsGrade); }
-        public SimpleIntegerProperty physicsGradeProperty() { return physicsGrade; }
+        public List<Integer> getBiologyGrades() { return biologyGrades; }
+        public List<Integer> getLiteratureGrades() { return literatureGrades; }
+        public List<Integer> getDigitalCultureGrades() { return digitalCultureGrades; }
 
-        public int getHistoryGrade() { return historyGrade.get(); }
-        public void setHistoryGrade(int historyGrade) { this.historyGrade.set(historyGrade); }
-        public SimpleIntegerProperty historyGradeProperty() { return historyGrade; }
+        public void addMathGrade(int grade) { mathGrades.add(grade); }
+        public void addPhysicsGrade(int grade) { physicsGrades.add(grade); }
+        public void addHistoryGrade(int grade) { historyGrades.add(grade); }
+
+        public void addBiologyGrade(int grade) { biologyGrades.add(grade); }
+        public void addLiteratureGrade(int grade) { literatureGrades.add(grade); }
+        public void addDigitalCultureGrade(int grade) { digitalCultureGrades.add(grade); }
+
+        public double getMathAverage() {
+            return mathGrades.isEmpty() ? 0.0 : mathGrades.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        }
+
+        public double getPhysicsAverage() {
+            return physicsGrades.isEmpty() ? 0.0 : physicsGrades.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        }
+
+        public double getHistoryAverage() {
+            return historyGrades.isEmpty() ? 0.0 : historyGrades.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        }
+
+        public double getBiologyAverage() {
+            return biologyGrades.isEmpty() ? 0.0 : biologyGrades.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        }
+        public double getLiteratureAverage() {
+            return literatureGrades.isEmpty() ? 0.0 : literatureGrades.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        }
+        public double getDigitalCultureAverage() {
+            return digitalCultureGrades.isEmpty() ? 0.0 : digitalCultureGrades.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        }
+
+        // Legacy methods for backwards compatibility
+        public int getMathGrade() { return (int) Math.round(getMathAverage()); }
+        public int getPhysicsGrade() { return (int) Math.round(getPhysicsAverage()); }
+        public int getHistoryGrade() { return (int) Math.round(getHistoryAverage()); }
+
+        public int getBiologyGrade() { return (int) Math.round(getBiologyAverage()); }
+        public int getLiteratureGrade() { return (int) Math.round(getLiteratureAverage()); }
+        public int getDigitalCultureGrade() { return (int) Math.round(getDigitalCultureAverage()); }
+
+        public SimpleIntegerProperty mathGradeProperty() {
+            return new SimpleIntegerProperty(getMathGrade());
+        }
+        public SimpleIntegerProperty physicsGradeProperty() {
+            return new SimpleIntegerProperty(getPhysicsGrade());
+        }
+        public SimpleIntegerProperty historyGradeProperty() {
+            return new SimpleIntegerProperty(getHistoryGrade());
+        }
+
+        public SimpleIntegerProperty biologyGradeProperty() {
+            return new SimpleIntegerProperty(getBiologyGrade());
+        }
+        public SimpleIntegerProperty literatureGradeProperty() {
+            return new SimpleIntegerProperty(getLiteratureGrade());
+        }
+        public SimpleIntegerProperty digitalCultureGradeProperty() {
+            return new SimpleIntegerProperty(getDigitalCultureGrade());
+        }
 
         public double getAverage() {
-            return (mathGrade.get() + physicsGrade.get() + historyGrade.get()) / 3.0;
+            double mathAvg = getMathAverage();
+            double physicsAvg = getPhysicsAverage();
+            double historyAvg = getHistoryAverage();
+            double biologyAvg = getBiologyAverage();
+            double literatureAvg = getLiteratureAverage();
+            double digitalCultureAvg = getDigitalCultureAverage();
+
+            int subjects = 0;
+            double total = 0.0;
+
+            if (!mathGrades.isEmpty()) {
+                total += mathAvg;
+                subjects++;
+            }
+            if (!physicsGrades.isEmpty()) {
+                total += physicsAvg;
+                subjects++;
+            }
+            if (!historyGrades.isEmpty()) {
+                total += historyAvg;
+                subjects++;
+            }
+
+            if (!biologyGrades.isEmpty()) {
+                total += biologyAvg;
+                subjects++;
+            }
+            if (!literatureGrades.isEmpty()) {
+                total += literatureAvg;
+                subjects++;
+            }
+            if (!digitalCultureGrades.isEmpty()) {
+                total += digitalCultureAvg;
+                subjects++;
+            }
+
+            return subjects > 0 ? total / subjects : 0.0;
+        }
+
+        public String getGradesSummary() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Math: ").append(mathGrades.size()).append(" grades");
+            if (!mathGrades.isEmpty()) {
+                sb.append(" (avg: ").append(String.format("%.2f", getMathAverage())).append(")");
+            }
+            sb.append(", Physics: ").append(physicsGrades.size()).append(" grades");
+            if (!physicsGrades.isEmpty()) {
+                sb.append(" (avg: ").append(String.format("%.2f", getPhysicsAverage())).append(")");
+            }
+            sb.append(", History: ").append(historyGrades.size()).append(" grades");
+            if (!historyGrades.isEmpty()) {
+                sb.append(" (avg: ").append(String.format("%.2f", getHistoryAverage())).append(")");
+            }
+            sb.append(", Biology: ").append(biologyGrades.size()).append(" grades");
+            if (!biologyGrades.isEmpty()) {
+                sb.append(" (avg: ").append(String.format("%.2f", getBiologyAverage())).append(")");
+            }
+            sb.append(", Literature: ").append(literatureGrades.size()).append(" grades");
+            if (!literatureGrades.isEmpty()) {
+                sb.append(" (avg: ").append(String.format("%.2f", getLiteratureAverage())).append(")");
+            }
+            sb.append(", Digital Culture: ").append(digitalCultureGrades.size()).append(" grades");
+            if (!digitalCultureGrades.isEmpty()) {
+                sb.append(" (avg: ").append(String.format("%.2f", getDigitalCultureAverage())).append(")");
+            }
+            return sb.toString();
         }
     }
 
@@ -213,23 +347,58 @@ public class ClassroomManagementApp extends Application {
             protected void updateItem(Student student, boolean empty) {
                 super.updateItem(student, empty);
                 if (empty || student == null) {
+                    setGraphic(null);
                     setText(null);
                 } else {
-                    setText(student.getName() + " (Avg: " + String.format("%.2f", student.getAverage()) + ")");
+                    VBox vbox = new VBox(2);
+                    Label nameLabel = new Label(student.getName() + " (Overall Avg: " + String.format("%.2f", student.getAverage()) + ")");
+                    nameLabel.setStyle("-fx-font-weight: bold;");
+                    Label gradesLabel = new Label(student.getGradesSummary());
+                    gradesLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: gray;");
+
+                    HBox buttonBox = new HBox(5);
+                    Button addMathBtn = new Button("+ Math");
+                    Button addPhysicsBtn = new Button("+ Physics");
+                    Button addHistoryBtn = new Button("+ History");
+                    Button addBiologyBtn = new Button("+ Biology");
+                    Button addLiteratureBtn = new Button("+ Literature");
+                    Button addDigitalCultureBtn = new Button("+ Digital Culture");
+
+                    addMathBtn.setStyle("-fx-font-size: 10px;");
+                    addPhysicsBtn.setStyle("-fx-font-size: 10px;");
+                    addHistoryBtn.setStyle("-fx-font-size: 10px;");
+                    addBiologyBtn.setStyle("-fx-font-size: 10px;");
+                    addLiteratureBtn.setStyle("-fx-font-size: 10px;");
+                    addDigitalCultureBtn.setStyle("-fx-font-size: 10px;");
+
+                    addMathBtn.setOnAction(e -> addGradeToStudent(student, "Math"));
+                    addPhysicsBtn.setOnAction(e -> addGradeToStudent(student, "Physics"));
+                    addHistoryBtn.setOnAction(e -> addGradeToStudent(student, "History"));
+                    addBiologyBtn.setOnAction(e -> addGradeToStudent(student, "Biology"));
+                    addLiteratureBtn.setOnAction(e -> addGradeToStudent(student, "Literature"));
+                    addDigitalCultureBtn.setOnAction(e -> addGradeToStudent(student, "Digital Culture"));
+
+
+                    buttonBox.getChildren().addAll(addMathBtn, addPhysicsBtn, addHistoryBtn, addBiologyBtn, addLiteratureBtn, addDigitalCultureBtn);
+                    vbox.getChildren().addAll(nameLabel, gradesLabel, buttonBox);
+                    setGraphic(vbox);
+                    setText(null);
                 }
             }
         });
-        studentList.setPrefHeight(150);
+        studentList.setPrefHeight(200);
 
         // Buttons
         HBox buttonBox = new HBox(10);
         Button addButton = new Button("Add Student");
         Button deleteButton = new Button("Delete Student");
+        Button viewGradesButton = new Button("View All Grades");
 
         addButton.setOnAction(e -> addStudent());
         deleteButton.setOnAction(e -> deleteStudent(studentList));
+        viewGradesButton.setOnAction(e -> showDetailedGradesView());
 
-        buttonBox.getChildren().addAll(addButton, deleteButton);
+        buttonBox.getChildren().addAll(addButton, deleteButton, viewGradesButton);
 
         // Grades summary table
         TableView<Student> gradesTable = new TableView<>(currentClassroom.getStudents());
@@ -238,17 +407,47 @@ public class ClassroomManagementApp extends Application {
         nameCol.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         nameCol.setPrefWidth(120);
 
-        TableColumn<Student, Number> mathCol = new TableColumn<>("Math");
-        mathCol.setCellValueFactory(cellData -> cellData.getValue().mathGradeProperty());
-        mathCol.setPrefWidth(60);
+        TableColumn<Student, String> mathCol = new TableColumn<>("Math Avg");
+        mathCol.setCellValueFactory(cellData -> {
+            Student student = cellData.getValue();
+            return new SimpleStringProperty(String.format("%.2f (%d)", student.getMathAverage(), student.getMathGrades().size()));
+        });
+        mathCol.setPrefWidth(80);
 
-        TableColumn<Student, Number> physicsCol = new TableColumn<>("Physics");
-        physicsCol.setCellValueFactory(cellData -> cellData.getValue().physicsGradeProperty());
-        physicsCol.setPrefWidth(60);
+        TableColumn<Student, String> physicsCol = new TableColumn<>("Physics Avg");
+        physicsCol.setCellValueFactory(cellData -> {
+            Student student = cellData.getValue();
+            return new SimpleStringProperty(String.format("%.2f (%d)", student.getPhysicsAverage(), student.getPhysicsGrades().size()));
+        });
+        physicsCol.setPrefWidth(80);
 
-        TableColumn<Student, Number> historyCol = new TableColumn<>("History");
-        historyCol.setCellValueFactory(cellData -> cellData.getValue().historyGradeProperty());
-        historyCol.setPrefWidth(60);
+        TableColumn<Student, String> historyCol = new TableColumn<>("History Avg");
+        historyCol.setCellValueFactory(cellData -> {
+            Student student = cellData.getValue();
+            return new SimpleStringProperty(String.format("%.2f (%d)", student.getHistoryAverage(), student.getHistoryGrades().size()));
+        });
+        historyCol.setPrefWidth(80);
+
+        TableColumn<Student, String> biologyCol = new TableColumn<>("Biology Avg");
+        biologyCol.setCellValueFactory(cellData -> {
+            Student student = cellData.getValue();
+            return new SimpleStringProperty(String.format("%.2f (%d)", student.getBiologyAverage(), student.getBiologyGrades().size()));
+        });
+        biologyCol.setPrefWidth(80);
+
+        TableColumn<Student, String> literatureCol = new TableColumn<>("Literature Avg");
+        literatureCol.setCellValueFactory(cellData -> {
+            Student student = cellData.getValue();
+            return new SimpleStringProperty(String.format("%.2f (%d)", student.getLiteratureAverage(), student.getLiteratureGrades().size()));
+        });
+        literatureCol.setPrefWidth(80);
+
+        TableColumn<Student, String> digitalCultureCol = new TableColumn<>("Digital Culture Avg");
+        digitalCultureCol.setCellValueFactory(cellData -> {
+            Student student = cellData.getValue();
+            return new SimpleStringProperty(String.format("%.2f (%d)", student.getDigitalCultureAverage(), student.getDigitalCultureGrades().size()));
+        });
+        digitalCultureCol.setPrefWidth(100);
 
         TableColumn<Student, String> avgCol = new TableColumn<>("Average");
         avgCol.setCellValueFactory(cellData -> {
@@ -257,7 +456,7 @@ public class ClassroomManagementApp extends Application {
         });
         avgCol.setPrefWidth(70);
 
-        gradesTable.getColumns().addAll(nameCol, mathCol, physicsCol, historyCol, avgCol);
+        gradesTable.getColumns().addAll(nameCol, mathCol, physicsCol, historyCol, biologyCol, literatureCol, digitalCultureCol, avgCol);
         gradesTable.setPrefHeight(200);
 
         // Grade counts
@@ -267,23 +466,147 @@ public class ClassroomManagementApp extends Application {
         Label mathCountLabel = new Label();
         Label physicsCountLabel = new Label();
         Label historyCountLabel = new Label();
+        Label biologyCountLabel = new Label();
+        Label literatureCountLabel = new Label();
+        Label digitalCultureCountLabel = new Label();
         Label overallAvgLabel = new Label();
 
-        updateGradeCounts(mathCountLabel, physicsCountLabel, historyCountLabel, overallAvgLabel);
+        updateGradeCounts(mathCountLabel, physicsCountLabel, historyCountLabel, biologyCountLabel, literatureCountLabel, digitalCultureCountLabel, overallAvgLabel);
+
 
         // Update counts when students change
         currentClassroom.getStudents().addListener((javafx.collections.ListChangeListener<Student>) c -> {
-            updateGradeCounts(mathCountLabel, physicsCountLabel, historyCountLabel, overallAvgLabel);
+            updateGradeCounts(mathCountLabel, physicsCountLabel, historyCountLabel, biologyCountLabel, literatureCountLabel, digitalCultureCountLabel, overallAvgLabel);
         });
 
         root.getChildren().addAll(
                 backButton, title, studentList, buttonBox,
-                new Label("Grades:"), gradesTable,
-                gradeCountsLabel, mathCountLabel, physicsCountLabel, historyCountLabel, overallAvgLabel
+                new Label("Grade Summary:"), gradesTable,
+                gradeCountsLabel, mathCountLabel, physicsCountLabel, historyCountLabel,
+                biologyCountLabel, literatureCountLabel, digitalCultureCountLabel, overallAvgLabel
         );
 
-        Scene scene = new Scene(root, 500, 600);
+        Scene scene = new Scene(root, 600, 700);
         primaryStage.setScene(scene);
+    }
+
+    private void addGradeToStudent(Student student, String subject) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Add " + subject + " Grade");
+        dialog.setHeaderText("Add a new " + subject.toLowerCase() + " grade for " + student.getName() + ":");
+        dialog.setContentText("Grade (1-5):");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(gradeStr -> {
+            try {
+                int grade = Integer.parseInt(gradeStr.trim());
+                if (grade >= 1 && grade <= 5) {
+                    switch (subject) {
+                        case "Math" -> student.addMathGrade(grade);
+                        case "Physics" -> student.addPhysicsGrade(grade);
+                        case "History" -> student.addHistoryGrade(grade);
+                        case "Biology" -> student.addBiologyGrade(grade);
+                        case "Literature" -> student.addLiteratureGrade(grade);
+                        case "Digital Culture" -> student.addDigitalCultureGrade(grade);
+                    }
+                    updateSummaryTable();
+                    showStudentView(); // Refresh the view
+                } else {
+                    showAlert("Invalid Grade", "Grade must be between 1 and 5.");
+                }
+            } catch (NumberFormatException e) {
+                showAlert("Invalid Input", "Please enter a valid number.");
+            }
+        });
+    }
+
+    private void showDetailedGradesView() {
+        Stage detailStage = new Stage();
+        detailStage.setTitle("Detailed Grades - " + currentClassroom.getName());
+
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(20));
+
+        Label title = new Label("All Grades for " + currentClassroom.getName());
+        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        TextArea gradesArea = new TextArea();
+        gradesArea.setEditable(false);
+        gradesArea.setPrefRowCount(20);
+        gradesArea.setPrefColumnCount(50);
+
+        StringBuilder gradesText = new StringBuilder();
+        for (Student student : currentClassroom.getStudents()) {
+            gradesText.append("=== ").append(student.getName()).append(" ===\n");
+
+            gradesText.append("Math Grades (").append(student.getMathGrades().size()).append("): ");
+            if (student.getMathGrades().isEmpty()) {
+                gradesText.append("No grades");
+            } else {
+                gradesText.append(student.getMathGrades().toString());
+                gradesText.append(" | Average: ").append(String.format("%.2f", student.getMathAverage()));
+            }
+            gradesText.append("\n");
+
+            gradesText.append("Physics Grades (").append(student.getPhysicsGrades().size()).append("): ");
+            if (student.getPhysicsGrades().isEmpty()) {
+                gradesText.append("No grades");
+            } else {
+                gradesText.append(student.getPhysicsGrades().toString());
+                gradesText.append(" | Average: ").append(String.format("%.2f", student.getPhysicsAverage()));
+            }
+            gradesText.append("\n");
+
+            gradesText.append("History Grades (").append(student.getHistoryGrades().size()).append("): ");
+            if (student.getHistoryGrades().isEmpty()) {
+                gradesText.append("No grades");
+            } else {
+                gradesText.append(student.getHistoryGrades().toString());
+                gradesText.append(" | Average: ").append(String.format("%.2f", student.getHistoryAverage()));
+            }
+            gradesText.append("\n");
+
+            gradesText.append("Biology Grades (").append(student.getBiologyGrades().size()).append("): ");
+            if (student.getBiologyGrades().isEmpty()) {
+                gradesText.append("No grades");
+            } else {
+                gradesText.append(student.getBiologyGrades().toString());
+                gradesText.append(" | Average: ").append(String.format("%.2f", student.getBiologyAverage()));
+            }
+            gradesText.append("\n");
+
+            gradesText.append("Literature Grades (").append(student.getLiteratureGrades().size()).append("): ");
+            if (student.getLiteratureGrades().isEmpty()) {
+                gradesText.append("No grades");
+            } else {
+                gradesText.append(student.getLiteratureGrades().toString());
+                gradesText.append(" | Average: ").append(String.format("%.2f", student.getLiteratureAverage()));
+            }
+            gradesText.append("\n");
+
+            gradesText.append("Digital Culture Grades (").append(student.getDigitalCultureGrades().size()).append("): ");
+            if (student.getDigitalCultureGrades().isEmpty()) {
+                gradesText.append("No grades");
+            } else {
+                gradesText.append(student.getDigitalCultureGrades().toString());
+                gradesText.append(" | Average: ").append(String.format("%.2f", student.getDigitalCultureAverage()));
+            }
+            gradesText.append("\n");
+
+            gradesText.append("Overall Average: ").append(String.format("%.2f", student.getAverage()));
+            gradesText.append("\n\n");
+        }
+
+        gradesArea.setText(gradesText.toString());
+
+        Button closeButton = new Button("Close");
+        closeButton.setOnAction(e -> detailStage.close());
+
+        root.getChildren().addAll(title, gradesArea, closeButton);
+
+        Scene scene = new Scene(root, 500, 600);
+        detailStage.setScene(scene);
+        detailStage.show();
     }
 
     private void createClassroom() {
@@ -320,47 +643,17 @@ public class ClassroomManagementApp extends Application {
     }
 
     private void addStudent() {
-        Dialog<Student> dialog = new Dialog<>();
+        TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Student");
-        dialog.setHeaderText("Enter student information:");
+        dialog.setHeaderText("Enter student name:");
+        dialog.setContentText("Name:");
 
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
-        TextField nameField = new TextField();
-        nameField.setPromptText("Student Name");
-        Spinner<Integer> mathSpinner = new Spinner<>(0, 100, 0);
-        Spinner<Integer> physicsSpinner = new Spinner<>(0, 100, 0);
-        Spinner<Integer> historySpinner = new Spinner<>(0, 100, 0);
-
-        grid.add(new Label("Name:"), 0, 0);
-        grid.add(nameField, 1, 0);
-        grid.add(new Label("Math Grade:"), 0, 1);
-        grid.add(mathSpinner, 1, 1);
-        grid.add(new Label("Physics Grade:"), 0, 2);
-        grid.add(physicsSpinner, 1, 2);
-        grid.add(new Label("History Grade:"), 0, 3);
-        grid.add(historySpinner, 1, 3);
-
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == ButtonType.OK) {
-                String name = nameField.getText().trim();
-                if (!name.isEmpty()) {
-                    return new Student(name, mathSpinner.getValue(), physicsSpinner.getValue(), historySpinner.getValue());
-                }
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            if (!name.trim().isEmpty()) {
+                currentClassroom.getStudents().add(new Student(name.trim()));
+                updateSummaryTable();
             }
-            return null;
-        });
-
-        Optional<Student> result = dialog.showAndWait();
-        result.ifPresent(student -> {
-            currentClassroom.getStudents().add(student);
-            updateSummaryTable();
         });
     }
 
@@ -393,28 +686,75 @@ public class ClassroomManagementApp extends Application {
         }
     }
 
-    private void updateGradeCounts(Label mathLabel, Label physicsLabel, Label historyLabel, Label avgLabel) {
+    private void updateGradeCounts(Label mathLabel, Label physicsLabel, Label historyLabel, Label biologyLabel, Label literatureLabel, Label digitalCultureLabel, Label avgLabel)
+    {
         if (currentClassroom.getStudents().isEmpty()) {
-            mathLabel.setText("Math grades: 0 students");
-            physicsLabel.setText("Physics grades: 0 students");
-            historyLabel.setText("History grades: 0 students");
+            mathLabel.setText("Math grades: 0 students, 0 total grades");
+            physicsLabel.setText("Physics grades: 0 students, 0 total grades");
+            historyLabel.setText("History grades: 0 students, 0 total grades");
+            biologyLabel.setText("Biology grades: 0 students, 0 total grades");
+            literatureLabel.setText("Literature grades: 0 students, 0 total grades");
+            digitalCultureLabel.setText("Digital Culture grades: 0 students, 0 total grades");
             avgLabel.setText("Overall average: 0.00");
             return;
         }
 
         List<Student> students = currentClassroom.getStudents();
-        int mathCount = students.size();
-        int physicsCount = students.size();
-        int historyCount = students.size();
 
-        double mathAvg = students.stream().mapToInt(Student::getMathGrade).average().orElse(0);
-        double physicsAvg = students.stream().mapToInt(Student::getPhysicsGrade).average().orElse(0);
-        double historyAvg = students.stream().mapToInt(Student::getHistoryGrade).average().orElse(0);
+        int mathStudents = (int) students.stream().filter(s -> !s.getMathGrades().isEmpty()).count();
+        int physicsStudents = (int) students.stream().filter(s -> !s.getPhysicsGrades().isEmpty()).count();
+        int historyStudents = (int) students.stream().filter(s -> !s.getHistoryGrades().isEmpty()).count();
+
+        int totalMathGrades = students.stream().mapToInt(s -> s.getMathGrades().size()).sum();
+        int totalPhysicsGrades = students.stream().mapToInt(s -> s.getPhysicsGrades().size()).sum();
+        int totalHistoryGrades = students.stream().mapToInt(s -> s.getHistoryGrades().size()).sum();
+
+        int biologyStudents = (int) students.stream().filter(s -> !s.getBiologyGrades().isEmpty()).count();
+        int literatureStudents = (int) students.stream().filter(s -> !s.getLiteratureGrades().isEmpty()).count();
+        int digitalCultureStudents = (int) students.stream().filter(s -> !s.getDigitalCultureGrades().isEmpty()).count();
+
+        int totalBiologyGrades = students.stream().mapToInt(s -> s.getBiologyGrades().size()).sum();
+        int totalLiteratureGrades = students.stream().mapToInt(s -> s.getLiteratureGrades().size()).sum();
+        int totalDigitalCultureGrades = students.stream().mapToInt(s -> s.getDigitalCultureGrades().size()).sum();
+
+        double mathAvg = mathStudents > 0 ? students.stream()
+                .filter(s -> !s.getMathGrades().isEmpty())
+                .mapToDouble(Student::getMathAverage)
+                .average().orElse(0) : 0;
+
+        double physicsAvg = physicsStudents > 0 ? students.stream()
+                .filter(s -> !s.getPhysicsGrades().isEmpty())
+                .mapToDouble(Student::getPhysicsAverage)
+                .average().orElse(0) : 0;
+
+        double historyAvg = historyStudents > 0 ? students.stream()
+                .filter(s -> !s.getHistoryGrades().isEmpty())
+                .mapToDouble(Student::getHistoryAverage)
+                .average().orElse(0) : 0;
+
+        double biologyAvg = biologyStudents > 0 ? students.stream()
+                .filter(s -> !s.getBiologyGrades().isEmpty())
+                .mapToDouble(Student::getBiologyAverage)
+                .average().orElse(0) : 0;
+
+        double literatureAvg = literatureStudents > 0 ? students.stream()
+                .filter(s -> !s.getLiteratureGrades().isEmpty())
+                .mapToDouble(Student::getLiteratureAverage)
+                .average().orElse(0) : 0;
+
+        double digitalCultureAvg = digitalCultureStudents > 0 ? students.stream()
+                .filter(s -> !s.getDigitalCultureGrades().isEmpty())
+                .mapToDouble(Student::getDigitalCultureAverage)
+                .average().orElse(0) : 0;
+
         double overallAvg = currentClassroom.getClassAverage();
 
-        mathLabel.setText(String.format("Math grades: %d students (avg: %.2f)", mathCount, mathAvg));
-        physicsLabel.setText(String.format("Physics grades: %d students (avg: %.2f)", physicsCount, physicsAvg));
-        historyLabel.setText(String.format("History grades: %d students (avg: %.2f)", historyCount, historyAvg));
+        mathLabel.setText(String.format("Math: %d students, %d total grades (avg: %.2f)", mathStudents, totalMathGrades, mathAvg));
+        physicsLabel.setText(String.format("Physics: %d students, %d total grades (avg: %.2f)", physicsStudents, totalPhysicsGrades, physicsAvg));
+        historyLabel.setText(String.format("History: %d students, %d total grades (avg: %.2f)", historyStudents, totalHistoryGrades, historyAvg));
+        biologyLabel.setText(String.format("Biology: %d students, %d total grades (avg: %.2f)", biologyStudents, totalBiologyGrades, biologyAvg));
+        literatureLabel.setText(String.format("Literature: %d students, %d total grades (avg: %.2f)", literatureStudents, totalLiteratureGrades, literatureAvg));
+        digitalCultureLabel.setText(String.format("Digital Culture: %d students, %d total grades (avg: %.2f)", digitalCultureStudents, totalDigitalCultureGrades, digitalCultureAvg));
         avgLabel.setText(String.format("Overall class average: %.2f", overallAvg));
     }
 
